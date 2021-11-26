@@ -1,6 +1,6 @@
 # BudgetTracker
 
-BudgetTracker is an automated tracking your debit and credit card bill. It gives you analysis and breakdwon of your finance.
+BudgetTracker is an automated tracking your debit and credit card bill. It gives you analysis and breakdwon of your finance by allowing user to use user's bank or credit card csv file. 
 
 ## **Installation**
 
