@@ -27,7 +27,7 @@ Follow this link for installation guideline: https://matplotlib.org/3.4.3/users/
 
 ### Test the program
 1. Run the program on lower bounded and upper bounded cases
-2. When merge the pull request, make sure no error was encountered during automatic testing
+2. When open the pull request, make sure no error was encountered during automatic testing
 
 ### Coding Standard
 1. The project is mainly written in python. Please follow [Python Coding Standard](https://www.python.org/dev/peps/pep-0008/).
