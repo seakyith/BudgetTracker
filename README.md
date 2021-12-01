@@ -2,6 +2,10 @@
 
 BudgetTracker is an automated tracking your debit and credit card bill. It gives you analysis and breakdwon of your finance by allowing user to use user's bank or credit card csv file. 
 
+
+## Goals
+The goal of this application is automating personalized monthly budget tracking using user credit and debit card bills <br>
+
 ## **Installation**
 
 Compatible with Python 3.6 and higher.
@@ -14,7 +18,7 @@ Follow this link for installation guideline: https://matplotlib.org/3.4.3/users/
 ### Getting Started
 1. Reply to one of the issues that were posted. <br>
 2. The issue will assign to you based on first come first serve. <br>
-3. Fork the project. <br>
+4. Fork the project and clone a version of this project. <br>
 
 
 ### Run the program
