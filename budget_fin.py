@@ -3,8 +3,25 @@ import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
+import sys
 
-
+def readFromCsv(csvfile,con):
+    cur = con.cursor()
+    with open(csvfile) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            balance = row['Amount']
+            name = row['Description']
+            cur.execute ("INSERT INTO balance (name) VALUES(?)", [name])
+            id = cur.execute("INSERT INTO balance (balance) VALUES(?)", [balance])
+            id = cur.lastrowid
+            for type in row["Type"].split():
+                cur.execute("INSERT INTO Transtype (balance_id, type) VALUES (?, ?)", (id, type))
+            for date in row["Post Date"].split():
+                cur.execute("INSERT INTO date(balance_id, transDATE) VALUES(?, ?)", (id, date))
+            for category in row["Category"].split(","):
+                cur.execute("INSERT INTO category(balance_id, saleCategory) VALUES(?, ?)", (id, category))
+    con.commit()
 
 open("creditexpense.db", "w").close()
 con = sqlite3.connect("creditexpense.db")
@@ -13,53 +30,33 @@ cur.execute("CREATE TABLE balance(id INTEGER PRIMARY KEY, balance FLOAT, name TE
 cur.execute ("CREATE TABLE date(balance_id INTEGER, transDate DATE, FOREIGN KEY(balance_id) REFERENCES balance(id)) ")
 cur.execute("CREATE TABLE Transtype (balance_id INTEGER, type TEXT, FOREIGN KEY(balance_id) REFERENCES balance(id))")
 cur.execute("CREATE TABLE category(saleCategory TEXT, balance_id, FOREIGN KEY(balance_id) REFERENCES balance(id))")
-with open ("creditcard.csv") as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        balance = row["Amount"]
-        name = row["Description"]
-        cur.execute ("INSERT INTO balance (name) VALUES(?)", [name])
-        id = cur.execute("INSERT INTO balance (balance) VALUES(?)", [balance])
-        id = cur.lastrowid
-        for type in row["Type"].split():
-            cur.execute("INSERT INTO Transtype (balance_id, type) VALUES (?, ?)", (id, type))
-        for date in row["Post Date"].split():
-            cur.execute("INSERT INTO date(balance_id, transDATE) VALUES(?, ?)", (id, date))
-        for category in row["Category"].split(","):
-            cur.execute("INSERT INTO category(balance_id, saleCategory) VALUES(?, ?)", (id, category))
+
+input_files = sys.argv[1:]
+for input_file in input_files:
+    readFromCsv(input_file,con)
 
 sale =  cur.execute("SELECT tB.saleCategory, SUM(tA.balance) FROM category tB JOIN balance tA ON tA.id=tB.balance_id GROUP BY tB.balance_id")
-
 
 category =[]
 amount = []
 for row in sale:
     print(row)
     category.append(row[0])
-    amount.append(row[1])
+    amount.append(row[1]**2)
 plt.pie(amount, labels=category)
 plt.show()
 
 # Line Graph of budget against time of transactions
-dates = [
-    i[0]
-    for i in cur.execute(
-        "SELECT DISTINCT dt.transDATE from date dt ORDER BY dt.transDATE"
-    )
-]
+dates = [i[0] for i in cur.execute("SELECT DISTINCT dt.transDATE from date dt ORDER BY dt.transDATE")]
 dtime = []
 rbudg = [0]
 time_expense = {"Green": [[], []], "Red": [[], []]}
 
 for date in dates:
     res = [
-        item[0]
-        for item in cur.execute(
-            "SELECT SUM(ba.balance) FROM balance ba, date dt WHERE dt.balance_id=ba.id AND dt.transDATE='{}'".format(
-                date
-            )
-        )
-    ]
+        item[0] for item in cur.execute(
+            "SELECT SUM(ba.balance) FROM balance ba, date dt WHERE dt.balance_id=ba.id AND dt.transDATE='{}'".format(date)
+        )]
     dtime.append(datetime.strptime(date, "%m/%d/%Y"))
     rbudg.append(rbudg[-1] + res[0])
     if rbudg[-1] > 0:
@@ -72,9 +69,7 @@ for date in dates:
 del rbudg[0]
 # Apply data to plot
 plt.plot(dtime, rbudg, color="Blue", zorder=5)
-plt.scatter(
-    time_expense["Green"][0], time_expense["Green"][1], color="Green", zorder=10
-)
+plt.scatter(time_expense["Green"][0], time_expense["Green"][1], color="Green", zorder=10)
 plt.scatter(time_expense["Red"][0], time_expense["Red"][1], color="Red", zorder=15)
 plt.axhline(y=0, color="Black", linewidth=1, zorder=2)
 plt.show()

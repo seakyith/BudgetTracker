@@ -23,7 +23,7 @@ Follow this link for installation guideline: https://matplotlib.org/3.4.3/users/
 
 ### Run the program
 1. Open the terminal to the location of main.py
-2. python3 budget_fin.py
+2. python3 budget_fin.py creditexpense1.csv creditexpense2.csv
 
 ### Test the program
 1. Run the program on lower bounded and upper bounded cases
